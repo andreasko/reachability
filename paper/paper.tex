@@ -1,0 +1,59 @@
+\include{header}
+\title{Infections on temporal networks - a matrix based approach}
+\date{}
+\author{}
+
+\begin{document}
+\maketitle
+
+\section{Einführung}
+
+Die mathematische Modellierung von Krankheiten beginnt typischerweise mit einer Reihe von Annahmen. Wir legen zuallererst fest, dass unsere Population aus einer festen Anzahl von Individuuen besteht, die jeweils einen Zustand annehmen können. Hierbei bildet das SIR-Modell einen Spezialfall mit den Kategorien suszeptibel (S), infiziert (I) und immun (R). In der diskreten Form (\ref{eq:intro1}-\ref{eq:intro1}) wird außerdem angenommen, dass bei einem Kontakt der Erreger mit einer Wahrscheinlichkeit $\alpha$ übertragen wird und dass der Übergang $I \rightarrow R$ nach einem Zeitschritt mit der Wahrscheinlichkeit $\beta$ auftritt.
+\begin{align}
+ [I]_{t+1} &= [I]_t  + \alpha [IS]_t - \beta [I]_t \label{eq:intro1} \\
+ [R]_{t+1} &= [R]_t + \alpha [I]_t \label{eq:intro2}
+\end{align}
+Die Notation $[I]_t$ beschreibt die Anzahl der Individuen im Zustand I und $[IS]_t$ gibt die Anzahl der Kontakte zwischen Infizierten und Suszeptiblen zum Zeitpunkt t an. Außgehend von diesem Gleichungssytem gibt es eine Reihe von Ansätzen und den Term $[IS]$ zu approximieren um verschiedene Eigenschaften der zugrunde liegenden Kontaktstruktur einzubauen [Keeling].
+Ein zeitlich veränderliches Netzwerk bei dem Knoten Individuen representieren und Links die momentanen Kontakte zwischen ihnen, ermöglicht es uns, bei hinreichender Auflösung, die Größe $[IS]$ direkt aus der topologischen Struktur herauszulesen. Damit ist es uns nun möglich die Krankheitsausbreitung, sowie die zugrunde liegende Dynamik des Graphen einheitlich zu behandeln.
+
+\section{Vector Formalism}
+Im ersten Schritt ersetzen wir die Anzahl der Individuuen eines bestimmten Zustands durch einen entsprechenden Vektor (Gleichung ..), der die Zugehörigkeit der einzelnen Knoten wiederspiegelt. Wir nehmen vereinfachend an, dass die Infektion bei einem Kontakt mit Sicherheit übertragen wird ($\alpha = 1$) und dabei nur die nächsten Nachbarn betrifft. Außerdem ersetzen wir die Erholungswahrscheinlichkeit $\beta$ durch eine festgelegte Krankheitsdauer von $\tau$ Zeitschritten.
+\begin{align}
+ [I] &\rightarrow (\vec{i})_k =\left\{\begin{array}{ll} 
+					1, & \text{node k is infected} \\
+					0, & \text{otherwise}\end{array}\right. \label{def:zustand_I} \\
+ [R] &\rightarrow (\vec{i})_k =\left\{\begin{array}{ll} 
+					1, & \text{node k is infected} \\
+					0, & \text{otherwise}\end{array}\right. \label{def:zustand_R}
+\end{align}
+Den binären Vektoren \ref{def:zustand_I} und \ref{def:zustand_R} entsprechend werden wir im Folgenden eine boolsche Arithmetik verwenden, ohne dass es in zukunft explizit erwähnt wird. Dabei stellt die skalare Addition das logische "oder" und die Multiplikation das logische "und" dar. Die verallgemeinerung auf Matrixoperationen ist trivial und zu erwähnen bleibt noch die elementweise Negation $\neg$
+
+Damit sind die Voraussetzungen aufgezählt und um die Dynamik nun zu modellieren stellt man zuerst fest, dass das Produkt $\textbf{A}_t\vec{i}_t$ aus der Adjazenzmatrix des Graphen zum Zeitpunkt t und dem Zustandsvektor $\vec{i}_t$ gerade die neuinfizierten Knoten angibt. Zusammen mit den bisher Infizierten entspricht $\textbf{A}_t\vec{i}_t+\vec{i}_t$ den ersten zwei Summanden aus Gleichung \ref{eq:intro1}. Der Übergang $I \rightarrow R$ wird nun durch eine elemtweise Multiplikation eingeführt, um sicherzustellen, dass ein immuner Knoten nicht gleichzeitig in einem anderen Zustand existieren kann \ref{eq:sir1}. Abschließend ergibt sich der Zustandsvektor $r_t$ aus den Knoten, die vor mindestens $\tau$ Zeitschritten infiziert wurden \ref{eq:sir2}. 
+\begin{align}
+ \vec{i}_{t+1} &= (\textbf{A}_t \vec{i}_t + \vec{i}_t) \circ (\neg ~ \vec{r}_{t+1}) \label{eq:sir1} \\
+ \vec{r}_{t+1} &= \sum_{k=0}^{t-\tau} \vec{i}_k \label{eq:sir2}
+\end{align}
+Das Gleichungssytem \ref{eq:sir2}-\ref{eq:sir2} beschreibt nun die Krankheitsdynamik, ausgehend vom Anfangswert $\vec{i}_0 und \vec{r}_0$ und zieht dabei das zeitlich veränderliche Netzwerk über die Adjazenmatrizen $\textbf{A}_t$ explizit mit ein. Aus praktischen und konzeptionellen Überlegungen heraus bietet es sich an den Zustandsvektor zu verallgemeinern um zu einer reinen Matrix-Beschreibung überzugehen. 
+
+\section{Matrix Formalismus}
+
+In epidemiologischen Untersuchungen geht es oft darum die Rolle einzelner Knoten zu bewerten und dazu beginnt man mit einem kanonischen Startvektor $\vec{e}_k = (0 .. 0 1 0 .. 0)$ der einen eintzelnen kontagiösen Knoten $k$ am Anfang festlegt und setzt $\vec{r}_0 = \vec{0}$. Anstatt alle $N$ möglichen Startkonfigurationen eines N-dimensionalen Netzwerks einzelnen durchzugehen bietet es sich an die kanonischen Vektoren $\vec{e}_k$ zu einer Einheitsmatrix zusammenzufassen (Glg. \ref{eq:I0}).
+\begin{align}
+ \textbf{I}_0 &= \left[ \vec{e}_1,\vec{e}_2, ... , \vec{e}_N \right] = \mathbb{1} \label{eq:I0} \\
+ \textbf{R}_0 &= \left[ \vec{0},\vec{0}, ... , \vec{0} \right] = \mathbb{0}
+\end{align}
+
+Mit diesem Ansatz kann die Beschreibung durch Zustandsvektoren (Glg. \ref{eq:sir1},\ref{eq:sir2}) direkt in eine matrix-basierte Formulierung übertragen werden (Glg.), die nun neue Interpretationsmöglichkeiten eröffnet.
+\begin{align}
+ \textbf{I}_{t+1} &= (\textbf{A}_t \textbf{I}_t + \textbf{I}_t) \circ (\neg ~ \vec{r}_{t+1}) \label{eq:SIR1} \\
+ \textbf{r}_{t+1} &= \sum_{k=0}^{t-\tau} \textbf{I}_k \label{eq:SIR2}
+\end{align}
+
+Die k-te Spalte der Prävalenz-Matrix \textbf{I} beschreibt welche Knoten infiziert sind, wenn zu Beginn nur der entsprechende Knoten $k$ kontagiös war. Durch die Verwendung boolscher Arithmetik enthält die Matrix nur binäre Einträge und kann damit als Adjazenzmatrix eines Erreichbarkeitsgraphen interpretiert werden. Darin tritt eine gerichtete Kante $n_1 \rightarrow n_2$ genau dann auf, wenn vom ursprünglich infizierten Knoten $n_1$ ein Infektionspfad zu $n_2$ existiert, der die Annahmen erfüllt, die wir für die Krankheit getroffen haben. Die topologischen Eigenschaften des Erreichbarkeitsgraphen erlauben es nun die Krankheitsdynamik zu analysieren. Im Folgenden werden wir dazu beispielhaft ein soziales Kontaktnetzwerk, ein Sexualnetzwerk und ein Handelsnetzwerk auf die Pfaddichte hin untersuchen und ins Verhältnis zu Simulationen auf den entsprechenden aggregierten Graphen setzten.
+
+\section{Anwendung}
+
+
+
+%So lässt sich aus dem In-Degree ablesen, wie exponiert ein Knoten gegenüber einem beliebigen Ausbruchsort ist und umgekehrt spiegelt der Out-Degree den Anteil der erreichbaren Knoten wieder.  
+\end{document}
