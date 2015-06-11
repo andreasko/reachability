@@ -1,0 +1,42 @@
+#!/bin/bash
+
+echo "=========================================================="
+export SAVE=$6results/
+START=$(date +"%s")
+STARTH=$(date -u -d @${START} +"%T")
+echo "Starting on : $STARTH"
+echo "Running on node : $(hostname)"
+echo "Current directory : $(pwd)"
+echo "The job is called "$7
+echo "Memory is set to "$1
+echo "The epidemiologic Model: "$2
+echo "The temporal graph: "$3
+echo "Calculating R0: "$4
+echo "Use memory efficient algorithm: "$5
+echo "The result is stored in: "$SAVE
+echo "The Simulation time is $8 time steps"
+echo "=========================================================="
+echo ""
+
+python << M_PROG
+import simulation as sm
+import scipy.sparse as sp
+import numpy as np
+SM = sm.Simulation()
+SM.runSimulation("$3","1","$2","$1","$4","$5","$8")
+SM.save("$SAVE","$7")
+M_PROG
+
+END=$(date +"%s")
+ENDH=$(date -u -d @${END} +"%T")
+
+echo ""
+echo "=========================================================="
+echo "Finished at : $ENDH"
+echo "Run time in minutes:"
+echo "scale=2; ($END-$START)/60" | bc -l
+echo "Run time in hours:"
+echo "scale=2; ($END-$START)/3600" | bc -l
+echo "Run time in days:"
+echo "scale=2; ($END-$START)/86400" | bc -l
+echo "=========================================================="
